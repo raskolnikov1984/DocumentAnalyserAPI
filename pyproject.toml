@@ -1,0 +1,16 @@
+[project]
+name = "documentanalyserapi"
+version = "0.1.0"
+description = "Receive documents to validate"
+authors = [
+    {name = "aserrador",email = "alejandro.ayala@onecluster.org"}
+]
+license = {text = "GPL-2.0 license"}
+requires-python = ">=3.14"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
