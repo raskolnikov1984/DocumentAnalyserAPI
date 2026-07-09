@@ -1,0 +1,104 @@
+#+title: Analisis
+
+* Contexto
+** Descripción del Problema
+
+La empresa recibe archivos Excel en formato `.xlsx` con información que debe ser cargada, validada y consultada desde una API REST. El flujo principal es:
+
+1. **Carga:** Subir archivo `.xlsx` a través de un endpoint
+2. **Lectura:** Interpretar los datos según un template predefinido
+3. **Validación:** Verificar que cada registro cumpla reglas de negocio
+4. **Persistencia:** Almacenar registros válidos en base de datos
+5. **Consulta:** Permitir consultas paginadas de los datos cargados
+
+** Requerimientos Funcionales
+
+- Endpoint `POST /api/v1/upload` para carga de archivos `.xlsx`
+- Validación de extensión, encabezados y cada fila del registro
+- Reporte detallado de errores por fila: `{ row, field, value, message }`
+- Persistencia de registros válidos en base de datos relacional
+- Endpoint `GET /api/v1/records` con paginación (page, page_size)
+
+* Stack
+
+- Lenguaje: *Python*
+- Framework API: *FastAPI*
+- ORM: *SQLAlchemy* con soporte async
+- Base de datos: *SQLite*
+- Validación: *Pydantic*
+- Testing: *pytest* + *httpx*
+
+* Arquitectura
+
+Implementar una **arquitectura hexagonal** (también conocida como *Ports and Adapters*) para separar el dominio puro de la infraestructura.
+
+#### Justificación
+
+La arquitectura hexagonal se basa en el principio de **Dependency Inversion** (SOLID):
+
+- El **dominio** (modelos, reglas de negocio, puertos) **no depende** de ningún framework o librería externa
+- Los **adaptadores** implementan interfaces definidas por el dominio
+- Las **dependencias** van del exterior hacia el interior (hacia el dominio)
+
+**Ventajas para este proyecto:**
+
+| Ventaja              | Descripción                                                                                 |
+|----------------------+---------------------------------------------------------------------------------------------|
+| *Testabilidad*         | Se pueden crear mocks de los puertos sin depender de SQLAlchemy, openpyxl o archivos reales |
+| *Extensibilidad*       | Agregar un nuevo adaptador (ej: cambiar de openpyxl a pandas) no modifica el dominio        |
+| *Intercambiabilidad*   | Cambiar SQLite por PostgreSQL solo requiere un nuevo adaptador de persistencia              |
+| *Claridad*             | Cada capa tiene una responsabilidad bien definida                                           |
+
+* Estructura
+#+begin_comment
+Estructura de Directorios
+app/
+├── main.py                           # FastAPI app factory
+├── core/
+│   ├── config.py                     # Settings (pydantic-settings)
+│   ├── exceptions.py                 # Exception handlers
+│   ├── domain/
+│   │   ├── models.py                 # CbamRecord dataclass (dominio puro)
+│   │   └── ports/
+│   │       ├── record_repository.py  # ABC: save(), find_all(), count()
+│   │       ├── excel_parser.py       # ABC: parse(file) -> list[dict]
+│   │       └── record_validator.py   # ABC: validate(row, row_num) -> list[Error]
+│   └── services/
+│       └── upload_service.py         # Orchestration (usa ports, NO imports de infra)
+├── adapters/
+│   ├── api/
+│   │   └── routes/
+│   │       ├── upload.py             # POST /api/v1/upload
+│   │       └── records.py            # GET /api/v1/records
+│   ├── persistence/
+│   │   ├── models.py                 # SQLAlchemy ORM model
+│   │   ├── repository.py             # Implementa RecordRepository
+│   │   └── database.py               # Engine + get_db dependency
+│   ├── excel/
+│   │   └── openpyxl_parser.py        # Implementa ExcelParser con openpyxl
+│   └── validation/
+│       ├── pipeline.py               # ValidationPipeline (agrega validadores)
+│       └── validators/
+│           ├── required.py           # Campo requerido
+│           ├── type_check.py         # Tipo de dato
+│           ├── length.py             # Longitud min/max
+│           ├── format.py             # Email, regex, patrones
+│           ├── allowed_values.py     # Valores permitidos
+│           └── numeric.py            # Numérico positivo
+├── schemas/
+│   ├── upload.py                     # UploadResponse, ErrorDetail
+│   ├── record.py                     # RecordResponse
+│   └── pagination.py                 # PaginatedResponse[T]
+├── excel_templates/
+│   └── template.xlsx                 # Template Excel de ejemplo
+tests/
+├── conftest.py                       # Fixtures: app, client, db, test Excel
+├── unit/
+│   ├── test_validators.py            # Tests de cada validador individual
+│   └── test_upload_service.py        # Tests del servicio sin HTTP
+├── integration/
+│   ├── test_upload_api.py            # Tests del endpoint upload
+│   └── test_records_api.py           # Tests del endpoint records
+└── fixtures/
+    └── sample_data.xlsx              # Datos válidos de prueba
+#+end_comment
