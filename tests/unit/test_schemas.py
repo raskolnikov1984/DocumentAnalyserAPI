@@ -4,7 +4,9 @@ from app.schemas.pagination import PaginatedResponse
 
 
 def test_error_detail():
-    error = ErrorDetail(row=5, field="cn_code", value="abc", message="Invalid")
+    error = ErrorDetail(
+        row=5, field="cn_code", value="abc", message="Invalid"
+    )
     assert error.row == 5
     assert error.field == "cn_code"
     assert error.value == "abc"
@@ -18,8 +20,14 @@ def test_error_detail():
 
 
 def test_upload_response():
-    errors = [ErrorDetail(row=1, field="email", value="bad", message="Invalid email")]
-    resp = UploadResponse(total_rows=50, valid_rows=45, invalid_rows=5, errors=errors)
+    errors = [
+        ErrorDetail(
+            row=1, field="email", value="bad", message="Invalid email"
+        )
+    ]
+    resp = UploadResponse(
+        total_rows=50, valid_rows=45, invalid_rows=5, errors=errors
+    )
     assert resp.total_rows == 50
     assert resp.valid_rows == 45
     assert resp.invalid_rows == 5

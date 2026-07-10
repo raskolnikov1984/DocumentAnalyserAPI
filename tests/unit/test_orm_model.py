@@ -2,7 +2,6 @@ import pytest
 from sqlalchemy import text
 
 from app.adapters.persistence.database import Base, create_engine
-from app.adapters.persistence.models import CbamRecordModel
 
 
 @pytest.mark.asyncio

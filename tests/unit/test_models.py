@@ -1,7 +1,4 @@
 from dataclasses import fields
-
-import pytest
-
 from app.core.domain.models import CbamRecord
 
 

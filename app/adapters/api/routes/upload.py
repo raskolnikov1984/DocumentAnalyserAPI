@@ -23,13 +23,19 @@ def create_upload_router(
 
     if validator is None:
         validator = ValidationPipeline(
-            [RequiredValidator(fields=["eori_number", "declarant_legal_name"])]
+            [
+                RequiredValidator(
+                    fields=["eori_number", "declarant_legal_name"]
+                )
+            ]
         )
 
     @router.post("/upload")
     async def upload_file(
         file: UploadFile = File(...),
-        repo: SqlAlchemyRecordRepository = Depends(repository_factory) if repository_factory else None,
+        repo: SqlAlchemyRecordRepository = (
+            Depends(repository_factory) if repository_factory else None
+        ),
     ):
         if not file.filename or not file.filename.endswith(".xlsx"):
             raise HTTPException(
@@ -42,7 +48,9 @@ def create_upload_router(
         tmp.close()
 
         try:
-            service = UploadService(parser=parser, validator=validator, repository=repo)
+            service = UploadService(
+                parser=parser, validator=validator, repository=repo
+            )
             result = await service.upload(tmp.name)
 
             return UploadResponse(

@@ -1,4 +1,3 @@
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -17,30 +16,72 @@ def sample_xlsx():
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Template"
-    ws.append([
-        "EORI Number", "Declarant Legal Name", "Declarant Address",
-        "Contact Person", "Competent Authority", "CBAM Account Number",
-        "Data Owner", "TARIC Code", "CN Code", "Goods Description",
-        "Sector Category", "Product Type", "Import Volume",
-        "Date of importation", "Country of Origin", "Customs Declaration Ref",
-        "Supplier Name", "Notes / Comments",
-    ])
-    ws.append([
-        "DE123456789012345", "ArcelorMittal SA", "Addr 1",
-        "John Doe, john@test.com", "DEHSt", "CBAM-DE-2026-00142",
-        "Sam Smith", "7207111400", "72071114",
-        "Semi-finished iron", "Iron and Steel", "Complex",
-        1250, "05.05.2026", "China", "DE/2026/MRN-123",
-        "Supplier X", "",
-    ])
-    ws.append([
-        "DE987654321098765", "", "",
-        "", "DEHSt", "CBAM-DE-2026-00143",
-        "", "", "",
-        "", "Iron and Steel", "Simple",
-        500, "06.06.2026", "India", "",
-        "Supplier Y", "",
-    ])
+    ws.append(
+        [
+            "EORI Number",
+            "Declarant Legal Name",
+            "Declarant Address",
+            "Contact Person",
+            "Competent Authority",
+            "CBAM Account Number",
+            "Data Owner",
+            "TARIC Code",
+            "CN Code",
+            "Goods Description",
+            "Sector Category",
+            "Product Type",
+            "Import Volume",
+            "Date of importation",
+            "Country of Origin",
+            "Customs Declaration Ref",
+            "Supplier Name",
+            "Notes / Comments",
+        ]
+    )
+    ws.append(
+        [
+            "DE123456789012345",
+            "ArcelorMittal SA",
+            "Addr 1",
+            "John Doe, john@test.com",
+            "DEHSt",
+            "CBAM-DE-2026-00142",
+            "Sam Smith",
+            "7207111400",
+            "72071114",
+            "Semi-finished iron",
+            "Iron and Steel",
+            "Complex",
+            1250,
+            "05.05.2026",
+            "China",
+            "DE/2026/MRN-123",
+            "Supplier X",
+            "",
+        ]
+    )
+    ws.append(
+        [
+            "DE987654321098765",
+            "",
+            "",
+            "",
+            "DEHSt",
+            "CBAM-DE-2026-00143",
+            "",
+            "",
+            "",
+            "",
+            "Iron and Steel",
+            "Simple",
+            500,
+            "06.06.2026",
+            "India",
+            "",
+            "Supplier Y",
+            "",
+        ]
+    )
     wb.save(tmp.name)
     wb.close()
     yield tmp.name
@@ -55,16 +96,23 @@ async def app_with_db():
 
     from app.adapters.excel.openpyxl_parser import OpenpyxlParser
     from app.adapters.validation.pipeline import ValidationPipeline
-    from app.adapters.validation.validators.required import RequiredValidator
+    from app.adapters.validation.validators.required import (
+        RequiredValidator,
+    )
 
     parser = OpenpyxlParser()
     validators = [
-        RequiredValidator(fields=["declarant_legal_name", "contact_person"]),
+        RequiredValidator(
+            fields=["declarant_legal_name", "contact_person"]
+        ),
     ]
     validator = ValidationPipeline(validators)
 
     async def get_repo():
-        from app.adapters.persistence.database import create_session_factory
+        from app.adapters.persistence.database import (
+            create_session_factory,
+        )
+
         session_factory = create_session_factory(engine)
         async with session_factory() as session:
             yield SqlAlchemyRecordRepository(session)
@@ -81,11 +129,22 @@ async def app_with_db():
 @pytest.mark.asyncio
 async def test_upload_endpoint_returns_200(app_with_db, sample_xlsx):
     transport = ASGITransport(app=app_with_db)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=transport, base_url="http://test"
+    ) as client:
         with open(sample_xlsx, "rb") as f:
             response = await client.post(
                 "/api/v1/upload",
-                files={"file": ("test.xlsx", f, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
+                files={
+                    "file": (
+                        "test.xlsx",
+                        f,
+                        (
+                            "application/vnd.openxmlformats-"
+                            "officedocument.spreadsheetml.sheet"
+                        ),
+                    )
+                },
             )
     assert response.status_code == 200
 
@@ -93,11 +152,22 @@ async def test_upload_endpoint_returns_200(app_with_db, sample_xlsx):
 @pytest.mark.asyncio
 async def test_upload_endpoint_counts(app_with_db, sample_xlsx):
     transport = ASGITransport(app=app_with_db)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=transport, base_url="http://test"
+    ) as client:
         with open(sample_xlsx, "rb") as f:
             response = await client.post(
                 "/api/v1/upload",
-                files={"file": ("test.xlsx", f, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
+                files={
+                    "file": (
+                        "test.xlsx",
+                        f,
+                        (
+                            "application/vnd.openxmlformats-"
+                            "officedocument.spreadsheetml.sheet"
+                        ),
+                    )
+                },
             )
     data = response.json()
     assert data["total_rows"] == 2
@@ -108,7 +178,9 @@ async def test_upload_endpoint_counts(app_with_db, sample_xlsx):
 @pytest.mark.asyncio
 async def test_upload_endpoint_rejects_non_xlsx(app_with_db):
     transport = ASGITransport(app=app_with_db)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=transport, base_url="http://test"
+    ) as client:
         response = await client.post(
             "/api/v1/upload",
             files={"file": ("test.txt", b"not an xlsx", "text/plain")},

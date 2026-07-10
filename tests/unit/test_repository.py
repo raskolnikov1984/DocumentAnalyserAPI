@@ -1,7 +1,10 @@
 import pytest
-from sqlalchemy import text
 
-from app.adapters.persistence.database import Base, create_engine, create_session_factory
+from app.adapters.persistence.database import (
+    Base,
+    create_engine,
+    create_session_factory,
+)
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
 from app.core.domain.models import CbamRecord
 

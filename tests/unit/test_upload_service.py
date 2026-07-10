@@ -2,7 +2,6 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from app.core.domain.models import CbamRecord
 from app.core.services.upload_service import UploadResult, UploadService
 
 
@@ -116,13 +115,17 @@ async def test_upload_service_calls_parse(upload_service, mock_parser):
 
 
 @pytest.mark.asyncio
-async def test_upload_service_calls_validate(upload_service, mock_validator):
+async def test_upload_service_calls_validate(
+    upload_service, mock_validator
+):
     await upload_service.upload("dummy.xlsx")
     assert mock_validator.validate.await_count == 2
 
 
 @pytest.mark.asyncio
-async def test_upload_service_saves_only_valid(upload_service, mock_repository):
+async def test_upload_service_saves_only_valid(
+    upload_service, mock_repository
+):
     await upload_service.upload("dummy.xlsx")
     assert mock_repository.save.await_count == 1
 
@@ -131,7 +134,12 @@ async def test_upload_service_saves_only_valid(upload_service, mock_repository):
 async def test_upload_service_all_invalid(mock_parser, mock_repository):
     validator = AsyncMock()
     validator.validate.return_value = [
-        {"row": 1, "field": "cn_code", "value": "abc", "message": "Invalido"}
+        {
+            "row": 1,
+            "field": "cn_code",
+            "value": "abc",
+            "message": "Invalido",
+        }
     ]
     service = UploadService(
         parser=mock_parser,

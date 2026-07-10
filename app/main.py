@@ -5,7 +5,11 @@ from fastapi import FastAPI
 
 from app.adapters.api.routes.records import create_records_router
 from app.adapters.api.routes.upload import create_upload_router
-from app.adapters.persistence.database import Base, create_engine, create_session_factory
+from app.adapters.persistence.database import (
+    Base,
+    create_engine,
+    create_session_factory,
+)
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
 from app.core.config import Settings
 
@@ -23,7 +27,9 @@ def create_app(
 
     if repository_factory is None:
 
-        async def default_repo_factory() -> AsyncGenerator[SqlAlchemyRecordRepository, None]:
+        async def default_repo_factory() -> (
+            AsyncGenerator[SqlAlchemyRecordRepository, None]
+        ):
             session_factory = create_session_factory(engine)
             async with session_factory() as session:
                 yield SqlAlchemyRecordRepository(session)
@@ -44,7 +50,9 @@ def create_app(
         parser=parser,
         validator=validator,
     )
-    records_router = create_records_router(repository_factory=repository_factory)
+    records_router = create_records_router(
+        repository_factory=repository_factory
+    )
 
     app.include_router(upload_router, prefix=settings.api_v1_prefix)
     app.include_router(records_router, prefix=settings.api_v1_prefix)

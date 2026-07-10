@@ -21,7 +21,10 @@ class EmailValidator(BaseValidator):
                         "row": row_num,
                         "field": field,
                         "value": value,
-                        "message": f"El campo '{field}' no tiene un formato de email valido",
+                        "message": (
+                            f"El campo '{field}' "
+                            "no tiene un formato de email valido"
+                        ),
                     }
                 )
         return errors

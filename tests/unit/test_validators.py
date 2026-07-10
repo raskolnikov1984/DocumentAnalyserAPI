@@ -3,10 +3,13 @@ import pytest
 from app.adapters.validation.pipeline import ValidationPipeline
 from app.adapters.validation.validators.required import RequiredValidator
 from app.adapters.validation.validators.length import LengthValidator
-from app.adapters.validation.validators.numeric import PositiveNumericValidator
+from app.adapters.validation.validators.numeric import (
+    PositiveNumericValidator,
+)
 from app.adapters.validation.validators.email import EmailValidator
-from app.adapters.validation.validators.allowed_values import AllowedValuesValidator
-
+from app.adapters.validation.validators.allowed_values import (
+    AllowedValuesValidator,
+)
 
 SAMPLE_ROW = {
     "eori_number": "DE123456789012345",
@@ -101,7 +104,9 @@ async def test_pipeline_runs_all_validators():
     ]
     pipeline = ValidationPipeline(validators)
 
-    row = dict(SAMPLE_ROW, contact_person="", supplier_name="", import_volume=-5)
+    row = dict(
+        SAMPLE_ROW, contact_person="", supplier_name="", import_volume=-5
+    )
     errors = await pipeline.validate(row, 1)
     assert len(errors) == 3
 

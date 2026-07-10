@@ -12,9 +12,13 @@ def create_records_router(repository_factory=None) -> APIRouter:
     async def list_records(
         page: int = Query(1, ge=1),
         page_size: int = Query(20, ge=1, le=100),
-        repo: SqlAlchemyRecordRepository = Depends(repository_factory) if repository_factory else None,
+        repo: SqlAlchemyRecordRepository = (
+            Depends(repository_factory) if repository_factory else None
+        ),
     ):
-        records, total = await repo.find_all(page=page, page_size=page_size)
+        records, total = await repo.find_all(
+            page=page, page_size=page_size
+        )
         items = [
             RecordResponse(
                 eori_number=r.eori_number,
@@ -38,6 +42,8 @@ def create_records_router(repository_factory=None) -> APIRouter:
             )
             for r in records
         ]
-        return PaginatedResponse(page=page, page_size=page_size, total=total, items=items)
+        return PaginatedResponse(
+            page=page, page_size=page_size, total=total, items=items
+        )
 
     return router

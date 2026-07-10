@@ -1,5 +1,3 @@
-import pytest
-
 from app.core.exceptions import DomainError, ParseError, ValidationError
 
 
@@ -16,7 +14,9 @@ def test_parse_error():
 
 
 def test_validation_error():
-    error = ValidationError("validation error", row=5, field="cn_code", value="abc")
+    error = ValidationError(
+        "validation error", row=5, field="cn_code", value="abc"
+    )
     assert str(error) == "validation error"
     assert error.row == 5
     assert error.field == "cn_code"

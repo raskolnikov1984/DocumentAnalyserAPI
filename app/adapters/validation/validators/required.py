@@ -9,7 +9,9 @@ class RequiredValidator(BaseValidator):
         errors = []
         for field in self._fields:
             value = row.get(field)
-            if value is None or (isinstance(value, str) and value.strip() == ""):
+            if value is None or (
+                isinstance(value, str) and value.strip() == ""
+            ):
                 errors.append(
                     {
                         "row": row_num,

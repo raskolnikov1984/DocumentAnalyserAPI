@@ -19,16 +19,21 @@ class PositiveNumericValidator(BaseValidator):
                             "row": row_num,
                             "field": field,
                             "value": value,
-                            "message": f"El campo '{field}' debe ser un numero positivo",
+                            "message": (
+                                f"El campo '{field}' "
+                                "debe ser un numero positivo"
+                            ),
                         }
                     )
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 errors.append(
                     {
                         "row": row_num,
                         "field": field,
                         "value": value,
-                        "message": f"El campo '{field}' debe ser un numero valido",
+                        "message": (
+                            f"El campo '{field}' debe ser un numero valido"
+                        ),
                     }
                 )
         return errors
