@@ -23,6 +23,7 @@ COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 COPY app/ app/
+RUN mkdir logs && chown app:app logs
 
 EXPOSE 8000
 
