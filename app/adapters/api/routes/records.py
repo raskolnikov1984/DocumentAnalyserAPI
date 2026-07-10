@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query
+from loguru import logger
 
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
 from app.schemas.pagination import PaginatedResponse
@@ -37,6 +38,12 @@ def create_records_router(repository_factory=None) -> APIRouter:
         records, total = await repo.find_all(
             page=page, page_size=page_size
         )
+
+        logger.debug(
+            "Records query: page={page}, page_size={page_size}, total={total}, returned={returned}",
+            page=page, page_size=page_size, total=total, returned=len(records),
+        )
+
         items = [
             RecordResponse(
                 eori_number=r.eori_number,

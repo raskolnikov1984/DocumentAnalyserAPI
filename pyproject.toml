@@ -6,7 +6,7 @@ authors = [
     {name = "aserrador",email = "alejandro.ayala@onecluster.org"}
 ]
 license = {text = "GPL-2.0 license"}
-requires-python = ">=3.14"
+requires-python = ">=3.14,<4.0"
 dependencies = [
     "fastapi (>=0.139.0,<0.140.0)",
     "uvicorn[standard] (>=0.51.0,<0.52.0)",
@@ -15,6 +15,7 @@ dependencies = [
     "sqlalchemy (>=2.0.51,<3.0.0)",
     "aiosqlite (>=0.22.1,<0.23.0)",
     "asyncpg (>=0.30.0,<1.0.0)",
+    "loguru (>=0.7.3,<1.0.0)",
     "python-multipart (>=0.0.32,<0.0.33)"
 ]
 

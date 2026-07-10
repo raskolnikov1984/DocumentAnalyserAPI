@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from loguru import logger
 
 from app.adapters.excel.openpyxl_parser import OpenpyxlParser
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
@@ -89,6 +90,17 @@ def create_upload_router(
                 parser=parser, validator=validator, repository=repo
             )
             result = await service.upload(tmp.name)
+
+            logger.info(
+                "Upload processed: {filename} -> {valid} valid, {invalid} invalid out of {total} rows",
+                filename=file.filename,
+                valid=result.valid_rows,
+                invalid=result.invalid_rows,
+                total=result.total_rows,
+            )
+
+            if result.errors:
+                logger.debug("Validation errors: {errors}", errors=result.errors)
 
             return UploadResponse(
                 total_rows=result.total_rows,
