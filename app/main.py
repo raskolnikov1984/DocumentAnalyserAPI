@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.adapters.api.routes.records import create_records_router
 from app.adapters.api.routes.upload import create_upload_router
 from app.adapters.persistence.database import Base, create_engine, create_session_factory
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
@@ -43,8 +44,10 @@ def create_app(
         parser=parser,
         validator=validator,
     )
+    records_router = create_records_router(repository_factory=repository_factory)
 
     app.include_router(upload_router, prefix=settings.api_v1_prefix)
+    app.include_router(records_router, prefix=settings.api_v1_prefix)
 
     @app.get("/")
     async def root():
