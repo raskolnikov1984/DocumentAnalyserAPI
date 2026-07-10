@@ -28,4 +28,4 @@ def stop(c):
 @task
 def logs(c):
     """Ver logs en tiempo real."""
-    c.run("docker compose logs -f")
+    c.run("docker compose logs -f", pty=True)
