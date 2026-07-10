@@ -15,7 +15,7 @@ class SqlAlchemyRecordRepository(RecordRepository):
     async def save(self, record: CbamRecord) -> CbamRecord:
         model = CbamRecordModel(**{k: v for k, v in record.__dict__.items()})
         self._session.add(model)
-        await self._session.flush()
+        await self._session.commit()
         return record
 
     async def find_all(
