@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class ErrorDetail(BaseModel):
     row: int
     field: str
-    value: str | None = None
+    value: str | int | float | None = None
     message: str
 
 
