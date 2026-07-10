@@ -7,6 +7,16 @@ def run(c):
     c.run("uvicorn app.main:app --reload", pty=True)
 
 
+@task(
+    iterable=["path"],
+    help={"path": "Ruta especifica de test (ej: tests/unit/test_validators.py)"},
+)
+def test(c, path=None):
+    """Ejecutar tests."""
+    target = " ".join(path) if path else ""
+    c.run(f"pytest -v {target}", pty=True)
+
+
 @task
 def build(c):
     """Construir imagenes Docker."""

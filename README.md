@@ -34,7 +34,11 @@ invoke --list
 invoke run
 
 # 5. Ejecutar tests
-pytest -v
+invoke test
+
+# Ejecutar tests especificos
+invoke test --path tests/unit/test_validators.py
+invoke test --path tests/integration/test_bulk_upload.py
 ```
 
 ## Producción
@@ -59,6 +63,8 @@ invoke logs    # docker compose logs -f
 | Comando | Descripción |
 |---------|-------------|
 | `invoke run` | Inicia servidor de desarrollo con hot-reload |
+| `invoke test` | Ejecuta todos los tests |
+| `invoke test --path <ruta>` | Ejecuta un test específico |
 | `invoke build` | Construye imágenes Docker |
 | `invoke deploy` | Despliega a producción con Docker Compose |
 | `invoke stop` | Detiene servicios |
