@@ -23,6 +23,8 @@ COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 COPY app/ app/
+COPY alembic/ alembic/
+COPY alembic.ini .
 RUN mkdir logs && chown app:app logs
 
 EXPOSE 8000

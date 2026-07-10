@@ -39,3 +39,15 @@ def stop(c):
 def logs(c):
     """Ver logs en tiempo real."""
     c.run("docker compose logs -f", pty=True)
+
+
+@task
+def migrate(c):
+    """Ejecutar migraciones pendientes de la base de datos."""
+    c.run("alembic upgrade head", pty=True)
+
+
+@task
+def migration(c, message):
+    """Crear una nueva migracion autogenerada."""
+    c.run(f'alembic revision --autogenerate -m "{message}"', pty=True)

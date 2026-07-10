@@ -2,13 +2,14 @@ import time
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+from alembic.config import Config
+from alembic import command
 from fastapi import FastAPI, Request
 from loguru import logger
 
 from app.adapters.api.routes.records import create_records_router
 from app.adapters.api.routes.upload import create_upload_router
 from app.adapters.persistence.database import (
-    Base,
     create_engine,
     create_session_factory,
 )
@@ -44,10 +45,10 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        logger.info("Creating database tables...")
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("Database tables ready")
+        logger.info("Running database migrations...")
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        logger.info("Database migrations complete")
         yield
         logger.info("Disposing database engine...")
         await engine.dispose()
