@@ -34,7 +34,8 @@ class OpenpyxlParser(ExcelParser):
 
         rows = []
         for row in ws.iter_rows(min_row=2, values_only=True):
-            rows.append(dict(zip(mapped_headers, row)))
+            cleaned = {k: v if v is not None else "" for k, v in zip(mapped_headers, row)}
+            rows.append(cleaned)
 
         wb.close()
         return rows
