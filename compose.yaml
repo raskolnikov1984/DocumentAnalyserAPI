@@ -1,13 +1,13 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18
     container_name: cbam-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-cbam_db}
       POSTGRES_USER: ${POSTGRES_USER:-cbam_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: pg_isready -U ${POSTGRES_USER:-cbam_user} -d ${POSTGRES_DB:-cbam_db}
       interval: 5s

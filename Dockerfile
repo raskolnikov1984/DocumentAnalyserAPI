@@ -9,7 +9,7 @@ ENV POETRY_VERSION=2.0.0 \
 RUN pip install "poetry==$POETRY_VERSION"
 
 WORKDIR /app
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml ./
 RUN poetry install --only main --no-root
 
 # Stage 2: runtime
