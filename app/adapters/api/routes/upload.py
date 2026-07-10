@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.adapters.excel.openpyxl_parser import OpenpyxlParser
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
@@ -15,7 +15,7 @@ def create_upload_router(
     parser=None,
     validator=None,
 ) -> APIRouter:
-    router = APIRouter()
+    router = APIRouter(tags=["Upload"])
 
     if parser is None:
         parser = OpenpyxlParser()
@@ -23,9 +23,53 @@ def create_upload_router(
     if validator is None:
         validator = create_default_validator()
 
-    @router.post("/upload")
+    @router.post(
+        "/upload",
+        summary="Subir archivo CBAM",
+        description=(
+            "Recibe un archivo .xlsx con datos CBAM, valida cada fila contra las "
+            "reglas de negocio (EORI, CN Code, fechas, país, etc.) y persiste "
+            "solo los registros válidos. Devuelve un resumen con el conteo de "
+            "filas válidas e inválidas, más los errores detallados."
+        ),
+        response_model=UploadResponse,
+        status_code=status.HTTP_200_OK,
+        responses={
+            status.HTTP_400_BAD_REQUEST: {
+                "description": "El archivo no es un .xlsx válido",
+                "content": {
+                    "application/json": {
+                        "example": {"detail": "Solo se permiten archivos .xlsx"}
+                    }
+                },
+            },
+            status.HTTP_200_OK: {
+                "description": (
+                    "Archivo procesado correctamente. Retorna conteo de filas "
+                    "válidas e inválidas con los errores de validación."
+                ),
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "total_rows": 10,
+                            "valid_rows": 9,
+                            "invalid_rows": 1,
+                            "errors": [
+                                {
+                                    "row": 5,
+                                    "field": "eori_number",
+                                    "value": "INVALID",
+                                    "message": "El formato del EORI no es válido",
+                                }
+                            ],
+                        }
+                    }
+                },
+            },
+        },
+    )
     async def upload_file(
-        file: UploadFile = File(...),
+        file: UploadFile = File(..., description="Archivo .xlsx con datos CBAM"),
         repo: SqlAlchemyRecordRepository = (
             Depends(repository_factory) if repository_factory else None
         ),

@@ -43,7 +43,35 @@ def create_app(
         yield
         await engine.dispose()
 
-    app = FastAPI(title=settings.app_name, lifespan=lifespan)
+    app = FastAPI(
+        title=settings.app_name,
+        description=(
+            "API de validación e ingreso de datos CBAM (Carbon Border Adjustment "
+            "Mechanism). Recibe archivos .xlsx, valida cada fila contra reglas de "
+            "negocio (EORI, CN Code, país ISO, fechas, etc.), persiste registros "
+            "válidos y devuelve errores detallados por fila inválida."
+        ),
+        version="1.0.0",
+        contact={
+            "name": "OneCluster",
+            "email": "alejandro.ayala@onecluster.org",
+        },
+        license_info={
+            "name": "GPL-2.0",
+            "url": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+        },
+        openapi_tags=[
+            {
+                "name": "Upload",
+                "description": "Subida y validación de archivos CBAM (.xlsx)",
+            },
+            {
+                "name": "Records",
+                "description": "Consulta de registros CBAM almacenados",
+            },
+        ],
+        lifespan=lifespan,
+    )
 
     upload_router = create_upload_router(
         repository_factory=repository_factory,

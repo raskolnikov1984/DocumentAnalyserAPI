@@ -6,12 +6,30 @@ from app.schemas.record import RecordResponse
 
 
 def create_records_router(repository_factory=None) -> APIRouter:
-    router = APIRouter()
+    router = APIRouter(tags=["Records"])
 
-    @router.get("/records")
+    @router.get(
+        "/records",
+        summary="Listar registros CBAM",
+        description=(
+            "Retorna una lista paginada de registros CBAM almacenados. "
+            "Los resultados se ordenan por orden de inserción. "
+            "Usa los parámetros page y page_size para navegar entre páginas."
+        ),
+        response_model=PaginatedResponse,
+    )
     async def list_records(
-        page: int = Query(1, ge=1),
-        page_size: int = Query(20, ge=1, le=100),
+        page: int = Query(
+            1,
+            ge=1,
+            description="Número de página a recuperar (empieza en 1)",
+        ),
+        page_size: int = Query(
+            20,
+            ge=1,
+            le=100,
+            description="Cantidad de registros por página (máximo 100)",
+        ),
         repo: SqlAlchemyRecordRepository = (
             Depends(repository_factory) if repository_factory else None
         ),
