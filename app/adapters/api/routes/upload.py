@@ -5,8 +5,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from app.adapters.excel.openpyxl_parser import OpenpyxlParser
 from app.adapters.persistence.repository import SqlAlchemyRecordRepository
-from app.adapters.validation.pipeline import ValidationPipeline
-from app.adapters.validation.validators.required import RequiredValidator
+from app.adapters.validation.config import create_default_validator
 from app.core.services.upload_service import UploadService
 from app.schemas.upload import ErrorDetail, UploadResponse
 
@@ -22,13 +21,7 @@ def create_upload_router(
         parser = OpenpyxlParser()
 
     if validator is None:
-        validator = ValidationPipeline(
-            [
-                RequiredValidator(
-                    fields=["eori_number", "declarant_legal_name"]
-                )
-            ]
-        )
+        validator = create_default_validator()
 
     @router.post("/upload")
     async def upload_file(

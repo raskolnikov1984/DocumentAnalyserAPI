@@ -30,7 +30,7 @@ SAMPLE_ROW = {
     "cn_code": "72071114",
     "goods_description": "Semi-finished iron",
     "sector_category": "Iron and Steel",
-    "product_type": "Complex",
+    "product_type": "Complex Goods",
     "import_volume": 1250.0,
     "date_of_importation": "05.05.2026",
     "country_of_origin": "China",
@@ -147,7 +147,7 @@ async def test_email_validator_ok():
 @pytest.mark.asyncio
 async def test_allowed_values_validator_invalid():
     validator = AllowedValuesValidator(
-        fields={"product_type": {"Simple", "Complex"}}
+        fields={"product_type": {"Simple Goods", "Complex Goods"}}
     )
     row = dict(SAMPLE_ROW, product_type="InvalidType")
     errors = await validator.validate(row, 1)
@@ -157,7 +157,7 @@ async def test_allowed_values_validator_invalid():
 @pytest.mark.asyncio
 async def test_allowed_values_validator_ok():
     validator = AllowedValuesValidator(
-        fields={"product_type": {"Simple", "Complex"}}
+        fields={"product_type": {"Simple Goods", "Complex Goods"}}
     )
     errors = await validator.validate(SAMPLE_ROW, 1)
     assert errors == []
