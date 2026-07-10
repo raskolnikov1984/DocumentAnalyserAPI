@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import pytest
 
 
@@ -7,4 +6,4 @@ async def test_root(async_client):
     response = await async_client.get("/")
 
     assert response.status_code == 200
-    assert response.json() == {"message": "API is running!"}
+    assert response.json() == {"message": "DocumentAnalyserAPI is running!"}
